@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Catatan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        /* Form Section */
+        .form-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+        }
+
+        .form-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 1em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 8px rgba(102, 126, 234, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-cancel {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-cancel:hover {
+            background: #e0e0e0;
+        }
+
+        .form-section.editing {
+            background: #fffbf0;
+            border-left: 4px solid #ff9800;
+        }
+
+        /* Notes List Section */
+        .notes-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .note-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            border-top: 4px solid #667eea;
+        }
+
+        .note-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .note-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            word-wrap: break-word;
+        }
+
+        .note-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .note-date {
+            font-size: 0.85em;
+            color: #999;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #1976D2;
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #da190b;
+        }
+
+        .btn-delete:active {
+            transform: scale(0.98);
+        }
+
+        /* Empty State */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 50px 20px;
+            color: white;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .form-section {
+                position: static;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .notes-section {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        .error-message {
+            background: #f44336;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .success-message {
+            background: #4caf50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 Aplikasi Catatan</h1>
+            <p>Kelola catatan Anda dengan mudah</p>
+        </header>
+
+        <div class="content">
+            <!-- Form Section -->
+            <div class="form-section">
+                <h2 id="formTitle">Tambah Catatan Baru</h2>
+                <div id="message"></div>
+                <form id="noteForm">
+                    <div class="form-group">
+                        <label for="judul">Judul</label>
+                        <input type="text" id="judul" placeholder="Masukkan judul catatan" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="isi">Isi</label>
+                        <textarea id="isi" placeholder="Masukkan isi catatan" required></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn-save" id="btnSubmit">Simpan Catatan</button>
+                        <button type="button" class="btn-cancel" id="btnCancel" style="display:none;">Batal</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Notes List Section -->
+            <div id="notesList" class="notes-section">
+                <div class="loading">Memuat catatan...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/api/notes';
+        let notes = [];
+        let editingId = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNotes();
+            document.getElementById('noteForm').addEventListener('submit', handleSubmit);
+            document.getElementById('btnCancel').addEventListener('click', cancelEdit);
+        });
+
+        // Load all notes
+        async function loadNotes() {
+            try {
+                const response = await fetch(API_URL);
+                notes = await response.json();
+                renderNotes();
+            } catch (error) {
+                console.error('Error loading notes:', error);
+                showError('Gagal memuat catatan');
+            }
+        }
+
+        // Render notes
+        function renderNotes() {
+            const notesList = document.getElementById('notesList');
+            
+            if (notes.length === 0) {
+                notesList.innerHTML = '<div class="empty-state"><h3>Belum ada catatan</h3><p>Buat catatan baru untuk memulai</p></div>';
+                return;
+            }
+
+            notesList.innerHTML = notes.map(note => `
+                <div class="note-card">
+                    <h3>${escapeHtml(note.judul)}</h3>
+                    <div class="note-date">📅 ${note.tanggal_dibuat}</div>
+                    <p>${escapeHtml(note.isi)}</p>
+                    <div class="note-actions">
+                        <button class="btn-edit" onclick="editNote(${note.id})">✏️ Edit</button>
+                        <button class="btn-delete" onclick="deleteNote(${note.id})">🗑️ Hapus</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Add or update note
+        async function handleSubmit(e) {
+            e.preventDefault();
+            const judul = document.getElementById('judul').value.trim();
+            const isi = document.getElementById('isi').value.trim();
+
+            if (!judul || !isi) {
+                showError('Judul dan isi harus diisi');
+                return;
+            }
+
+            try {
+                let response;
+                if (editingId) {
+                    // Update existing note
+                    response = await fetch(`${API_URL}/${editingId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ judul, isi })
+                    });
+                } else {
+                    // Create new note
+                    response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ judul, isi })
+                    });
+                }
+
+                if (!response.ok) throw new Error('Gagal menyimpan catatan');
+                
+                showSuccess(editingId ? 'Catatan berhasil diperbarui' : 'Catatan berhasil ditambahkan');
+                cancelEdit();
+                loadNotes();
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Gagal menyimpan catatan');
+            }
+        }
+
+        // Edit note
+        async function editNote(id) {
+            const note = notes.find(n => n.id === id);
+            if (!note) return;
+
+            editingId = id;
+            document.getElementById('judul').value = note.judul;
+            document.getElementById('isi').value = note.isi;
+            document.getElementById('formTitle').textContent = 'Edit Catatan';
+            document.getElementById('btnSubmit').textContent = 'Perbarui Catatan';
+            document.getElementById('btnCancel').style.display = 'block';
+            document.querySelector('.form-section').classList.add('editing');
+            document.getElementById('judul').focus();
+            clearMessage();
+        }
+
+        // Cancel edit
+        function cancelEdit() {
+            editingId = null;
+            document.getElementById('noteForm').reset();
+            document.getElementById('formTitle').textContent = 'Tambah Catatan Baru';
+            document.getElementById('btnSubmit').textContent = 'Simpan Catatan';
+            document.getElementById('btnCancel').style.display = 'none';
+            document.querySelector('.form-section').classList.remove('editing');
+            clearMessage();
+        }
+
+        // Delete note
+        async function deleteNote(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus catatan ini?')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/${id}`, {
+                    method: 'DELETE'
+                });
+                if (!response.ok) throw new Error('Gagal menghapus catatan');
+                
+                showSuccess('Catatan berhasil dihapus');
+                loadNotes();
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Gagal menghapus catatan');
+            }
+        }
+
+        // Utility functions
+        function showError(message) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = 'error-message';
+            messageDiv.textContent = '❌ ' + message;
+        }
+
+        function showSuccess(message) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = 'success-message';
+            messageDiv.textContent = '✅ ' + message;
+            setTimeout(clearMessage, 3000);
+        }
+
+        function clearMessage() {
+            document.getElementById('message').innerHTML = '';
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>
